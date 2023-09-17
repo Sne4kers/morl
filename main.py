@@ -7,19 +7,20 @@ import copy
 import logging
 from datetime import datetime
 
-def sat_1(a, b):
+# reward functions for each of the objectives
+def sat_0(a, b):
     if a > 1000:
         return 0
     else:
         return -abs(a - 1001)/10000
 
-def sat_2(a, b):
+def sat_1(a, b):
     if a <= 1000:
         return 0
     else:
         return -abs(a - 1000)/10000
 
-def sat_3(a, b):
+def sat_2(a, b):
     if a > 1000:
         return -1
     if b < 666:
@@ -27,7 +28,7 @@ def sat_3(a, b):
     else:
         return -abs(b - 665)/10000
 
-def sat_4(a, b):
+def sat_3(a, b):
     if a > 1000:
         return -1
     if b >= 666:
@@ -35,6 +36,7 @@ def sat_4(a, b):
     else:
         return -abs(666 - b)/10000
 
+# logger initialization
 def get_logger():
     logger = logging.getLogger()
     now = datetime.now()
@@ -62,9 +64,6 @@ class Morlot:
 
     def choose_action(self, observation, rewards):
         self.action_count = self.action_count + 1
-
-        #print("Epsilon: "+str(self.epsilon))
-
         if not rewards:
             return random.randint(0, len(self.actions)-1)
         uncovered_list = self.obj_list.get_all_uncovered()
@@ -81,6 +80,7 @@ class Morlot:
         return (self.a_n, self.b_n)
 
     def perform(self, action):
+        # all types of mutation, basically increment and decrement operations for a and b
         if action == 0:
             self.a_n += 1
         elif action == 1:
@@ -92,10 +92,10 @@ class Morlot:
 
         return (
             [
+            sat_0(self.a_n, self.b_n),
             sat_1(self.a_n, self.b_n),
             sat_2(self.a_n, self.b_n),
-            sat_3(self.a_n, self.b_n),
-            sat_4(self.a_n, self.b_n)
+            sat_3(self.a_n, self.b_n)
             ]
         , (self.a_n, self.b_n))
 
@@ -112,10 +112,13 @@ class Morlot:
             stopping_condition = False
             logger = get_logger()
             while not stopping_condition:
+                # epsilon decay
                 if self.epsilon > 0.1:
                     self.epsilon *= 0.998
                 else:
                     self.epsilon = 0.1
+                
+                # morlot section of tehe algorithm
                 s = self.observe()
                 a = self.choose_action(s, rewards)
                 rewards, next_state = self.perform(a)
@@ -128,6 +131,7 @@ class Morlot:
 
                 print(self.a_n, self.b_n, self.epsilon)
 
+                # check if covered any objectives and log if so
                 for index in range(self.total_objs):
                     if rewards[index] == 0 and (index not in satisfied_obj):
                         satisfied_obj.add(index)
