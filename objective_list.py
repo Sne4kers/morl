@@ -43,7 +43,7 @@ class Objective_list:
     def choose_action(self, q_table_no, observation,epsilon):
         for u in self.uncovered_objective_list:
             if u.get_obj_no() == q_table_no:
-                return u.get_action(observation,epsilon)
+                return u.get_action(observation, epsilon)
 
     def learn(self, state, action, reward, next_state):
         for u in self.uncovered_objective_list:

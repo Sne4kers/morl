@@ -1,10 +1,9 @@
+import copy
+
 class TestCase:
-    def __init__(self):
-        self.tc = []
-        self.max_reward = -1
-    def update(self,set):
-        self.tc.append(set)
-    def update_reward(self,rev):
-        self.max_reward = rev
-    def get_reward(self):
-        return self.max_reward
+    def __init__(self, args, rewards):
+        self.tc = copy.deepcopy(args)
+        self.rewards = copy.deepcopy(rewards)
+
+    def __str__(self):
+        return str(self.tc)
