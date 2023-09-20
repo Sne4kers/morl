@@ -73,13 +73,13 @@ def sat_3_2(a, b, s):
         return -3
 
 def sat_4(count, b):
-    if count > b:
+    if count == b:
         return 0
     else:
         return -abs(b + 1 -count)/10000
 
 def sat_5(count, b):    
-    if count <= b:
+    if count != b:
         return 0
     else:
         return -abs(b-count)/10000
@@ -145,7 +145,7 @@ class Morlot:
 
     def choose_from_population(self):
         random_value = np.random.randint(low=0, high=len(self.obj_list.uncovered_objective_list))
-        id_of_uncovered_obj = self.obj_list.uncovered_objective_list[random_value].get_obj_no
+        id_of_uncovered_obj = self.obj_list.uncovered_objective_list[random_value].obj_no
         return self.population[id_of_uncovered_obj]
 
     def choose_action(self, observation):
@@ -238,8 +238,8 @@ class Morlot:
             else:
                 s = self.choose_from_population()
                 a = self.choose_action(s)
-                new_test_case = self.perform_action_on_testcase(a, testcase)
-                self.obj_list.learn((s.tc[0], s.tc[1], s.tc[2]), a, rewards, (new_test_case.tc[0], new_test_case.tc[1], new_test_case.tc[2]))
+                new_test_case = self.perform_action_on_testcase(a, s)
+                self.obj_list.learn((s.tc[0], s.tc[1], s.tc[2]), a, new_test_case.rewards, (new_test_case.tc[0], new_test_case.tc[1], new_test_case.tc[2]))
 
             actions_taken += 1
 
@@ -247,7 +247,7 @@ class Morlot:
                 stopping_condition = True
 
             if actions_taken % 1000 == 0:
-                print(self.a_n, self.b_n, repr(self.s_n), self.epsilon)
+                print(new_test_case)
             
             # check if covered any objectives and log if so
             for index in range(self.total_objs):
